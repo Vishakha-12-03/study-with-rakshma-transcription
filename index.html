@@ -1,42 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shorthand Transcription Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Shorthand Transcription Test</title>
 
 <style>
 body{
-    font-family:Arial;
+    font-family:Arial,sans-serif;
     margin:0;
     background:#f3f5fa;
     color:#111;
 }
+
 header{
     background:#080b45;
     color:white;
     text-align:center;
-    padding:22px 10px;
+    padding:30px 10px;
 }
+
+header h1{
+    margin:0 0 15px;
+    font-size:32px;
+}
+
+header p{
+    font-size:20px;
+}
+
 .box{
-    max-width:900px;
-    margin:25px auto;
+    max-width:950px;
+    margin:30px auto;
     background:white;
     padding:25px;
     border-radius:12px;
     box-shadow:0 3px 12px #ccc;
 }
+
 .info{
     display:flex;
     justify-content:space-around;
     text-align:center;
     margin-bottom:25px;
 }
+
+.info div{
+    font-size:18px;
+}
+
 .info b{
     display:block;
-    font-size:22px;
+    font-size:28px;
     color:#080b45;
 }
+
 button{
     padding:13px 25px;
     margin:5px;
@@ -46,19 +64,53 @@ button{
     background:#080b45;
     font-size:16px;
 }
+
+button:disabled{
+    background:#aaa;
+}
+
+#status{
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    margin:15px;
+}
+
+#timer{
+    text-align:center;
+    font-size:42px;
+    font-weight:bold;
+    margin:20px;
+    color:#080b45;
+}
+
 textarea{
     width:100%;
-    height:350px;
+    height:400px;
     margin-top:15px;
-    font-size:17px;
-    padding:12px;
+    font-size:18px;
+    padding:15px;
     box-sizing:border-box;
+    resize:vertical;
 }
+
 #submit{
+    display:none;
     background:#159447;
 }
+
 #result{
     display:none;
+}
+
+.result-line{
+    font-size:19px;
+    margin:10px 0;
+}
+
+#matter{
+    display:none;
+    line-height:1.7;
 }
 </style>
 </head>
@@ -73,32 +125,47 @@ textarea{
 <div class="box">
 
 <div class="info">
-<div><b>80 WPM</b>Speed</div>
-<div><b>5:00</b>Time</div>
-<div><b id="words">0</b>Words</div>
+<div>
+<b>80 WPM</b>
+Speed
+</div>
+
+<div>
+<b id="phase">10:00</b>
+Time
+</div>
+
+<div>
+<b id="words">0</b>
+Words
+</div>
 </div>
 
 <p>
-<b>Instruction:</b> Dictation matter will remain hidden during the test.
+<b>Instruction:</b>
+First listen to the complete 10-minute dictation.
+After dictation ends, you will get 30 minutes for transcription.
 </p>
 
-<button onclick="startTest()">▶ Start Test</button>
-<button id="play" onclick="playDictation()" style="display:none">
-🔊 Play Dictation
-</button>
+<button id="startBtn" onclick="startTest()">▶ Start Test</button>
 
-<div id="timer" style="text-align:center;font-size:28px;margin:15px">
-05:00
-</div>
+<div id="status">Ready for Dictation</div>
 
-<textarea id="typing" disabled
-placeholder="Type your transcription here..."></textarea>
+<div id="timer">10:00</div>
+
+<audio id="dictation" preload="auto">
+<source src="24-08-2026-2317_UylfzrYv.mp3" type="audio/mpeg">
+Your browser does not support audio.
+</audio>
+
+<textarea id="typing"
+disabled
+placeholder="Your transcription will start here after the dictation ends...">
+</textarea>
 
 <br>
 
-<button id="submit" onclick="checkTest()" style="display:none">
-✓ Submit Test
-</button>
+<button id="submit" onclick="checkTest()">✓ Submit Test</button>
 
 </div>
 
@@ -106,31 +173,53 @@ placeholder="Type your transcription here..."></textarea>
 
 <h2>📊 Test Result</h2>
 
-<p>Total Words: <b id="total">0</b></p>
-<p>Typed Words: <b id="typed">0</b></p>
-<p>Errors: <b id="error">0</b></p>
-<p>Accuracy: <b id="accuracy">0%</b></p>
+<div class="result-line">
+Total Words: <b id="total">0</b>
+</div>
 
-<button onclick="showMatter()">
-👁 View Actual Dictation
-</button>
+<div class="result-line">
+Typed Words: <b id="typed">0</b>
+</div>
 
-<p id="matter" style="display:none"></p>
+<div class="result-line">
+Errors: <b id="error">0</b>
+</div>
+
+<div class="result-line">
+Accuracy: <b id="accuracy">0%</b>
+</div>
+
+<button onclick="showMatter()">👁 View Actual Dictation</button>
+
+<p id="matter"></p>
 
 </div>
 
+
 <script>
 
-const matter =
-"This is a practice passage for English shorthand transcription. " +
-"The candidate should listen carefully and write the dictation accurately. " +
-"Regular practice is necessary to improve speed and accuracy. " +
-"A good stenographer should remain calm and concentrate on every word. " +
-"Accuracy is as important as speed in shorthand transcription.";
+const matter = `The Hon'ble Court, while considering the present matter, has carefully examined the facts placed on record by both the parties. The petitioner has approached the Court seeking appropriate relief against the order passed by the concerned authority. It has been submitted on behalf of the petitioner that the order in question was passed without properly considering the documents and circumstances placed before the authority. Learned counsel appearing for the petitioner submitted that the petitioner had fulfilled all the conditions prescribed under the relevant rules and had submitted the required documents within the stipulated period. It was further submitted that the petitioner was entitled to a fair and reasonable opportunity of hearing before any adverse decision could be taken against him. On the other hand, learned counsel appearing for the State opposed the petition and submitted that the competent authority had passed the impugned order after considering the available records. According to the State, the petitioner had failed to satisfy certain requirements prescribed under the applicable rules.
 
-let time = 300;
-let timer;
+It was therefore argued that no interference by the Court was necessary. The Court has considered the submissions advanced by learned counsel for the parties and has carefully perused the material available on record. It is well settled that whenever an administrative authority passes an order affecting the rights of a person, such order must disclose proper reasons. The reasons should demonstrate that the authority has applied its mind to the relevant facts and provisions of law. The principle of natural justice requires that a person likely to be affected by an adverse decision should ordinarily be given a reasonable opportunity to present his case. Such an opportunity is an important part of a fair procedure. The authority concerned must consider the explanation and documents submitted by the person before arriving at a final conclusion. In the present case, the Court finds that the order passed by the concerned authority does not contain sufficient or based on irrelevant considerations.
+
+The authority has referred to certain general observations but has not explained why the documents submitted by the petitioner were not acceptable. The Court is therefore of the view that the matter requires reconsideration by the competent authority. It is also necessary to observe that administrative powers must be exercised in accordance with law and for a proper purpose. Every public authority is expected to act fairly, reasonably and without discrimination. The exercise of statutory power cannot be arbitrary. The decision-making process must be transparent and consistent with the principles of fairness. The Constitution guarantees equality before law and equal protection of laws to every person. Public authorities are therefore required to ensure that similarly situated persons are treated in a similar manner. Any distinction made between persons must have a reasonable basis and must be supported by the relevant provisions of law. The Court has further observed that the responsibility of a public authority does not end merely by passing an order.
+
+The authority must ensure that the order is based upon relevant material and that the affected person is able to understand the reasons for the decision. A speaking order is essential because it enables the parties as well as the Court to examine whether the authority has acted within the limits of its jurisdiction. In view of the facts and circumstances of the present case, the impugned order is hereby set aside. The matter is remitted to the competent authority for fresh consideration. The authority shall examine the representation of the petitioner along with all relevant documents and shall pass a fresh and reasoned order in accordance with law. The petitioner shall be given a reasonable opportunity of hearing before the matter is finally decided. The competent authority shall consider all relevant submissions made by the petitioner and shall not be influenced by any observation contained in the earlier order which has been set aside by this Court.
+
+The Court makes it clear that the present order shall not be treated as an expression of opinion on the merits of the claim made by the petitioner. The competent authority shall independently examine the matter and take an appropriate decision in accordance with the applicable rules and the facts available on record. Justice requires not only a correct decision but also a fair procedure. The purpose of judicial review is to ensure that public authorities act within the framework of law and exercise their powers in a reasonable and responsible manner. Courts do not normally substitute their own opinion for that of the administrative authority, but they may interfere where the decision is arbitrary, unreasonable, without jurisdiction, or contrary to the principles of natural justice. It is expected that the concerned authority shall complete the fresh proceedings within a reasonable period and communicate the decision to the petitioner without unnecessary delay.`;
+
+let phase = "dictation";
+let time = 600;
+let timer = null;
 let started = false;
+
+function formatTime(seconds){
+    let m = Math.floor(seconds / 60);
+    let s = seconds % 60;
+
+    return String(m).padStart(2,"0") + ":" +
+           String(s).padStart(2,"0");
+}
 
 function startTest(){
 
@@ -138,103 +227,172 @@ function startTest(){
 
     started = true;
 
-    document.getElementById("typing").disabled = false;
-    document.getElementById("play").style.display = "inline-block";
-    document.getElementById("submit").style.display = "inline-block";
+    document.getElementById("startBtn").disabled = true;
 
-    document.getElementById("typing").focus();
+    document.getElementById("typing").disabled = true;
 
-    let count = matter.trim().split(/\s+/).length;
-    document.getElementById("words").innerText = count;
+    document.getElementById("status").innerText =
+        "🎧 Dictation is playing...";
 
-    playDictation();
+    time = 600;
+
+    document.getElementById("timer").innerText =
+        formatTime(time);
+
+    let audio = document.getElementById("dictation");
+
+    audio.currentTime = 0;
+
+    audio.play();
 
     timer = setInterval(function(){
 
         time--;
 
-        let m = Math.floor(time/60);
-        let s = time%60;
-
         document.getElementById("timer").innerText =
-        String(m).padStart(2,"0") + ":" +
-        String(s).padStart(2,"0");
+            formatTime(time);
 
         if(time <= 0){
+
             clearInterval(timer);
+
+            startTranscription();
+        }
+
+    },1000);
+}
+
+
+function startTranscription(){
+
+    phase = "transcription";
+
+    time = 1800;
+
+    document.getElementById("phase").innerText = "30:00";
+
+    document.getElementById("timer").innerText =
+        "30:00";
+
+    document.getElementById("status").innerText =
+        "⌨️ Dictation completed — 30 minutes transcription time started.";
+
+    document.getElementById("typing").disabled = false;
+
+    document.getElementById("typing").focus();
+
+    document.getElementById("submit").style.display =
+        "inline-block";
+
+    timer = setInterval(function(){
+
+        time--;
+
+        document.getElementById("timer").innerText =
+            formatTime(time);
+
+        if(time <= 0){
+
+            clearInterval(timer);
+
             checkTest();
         }
 
     },1000);
 }
 
-function playDictation(){
 
-    speechSynthesis.cancel();
+/* If audio finishes earlier than exactly 10 minutes,
+   transcription starts immediately after audio ends. */
 
-    let speech =
-    new SpeechSynthesisUtterance(matter);
+document.getElementById("dictation").addEventListener("ended",function(){
 
-    speech.lang = "en-IN";
-    speech.rate = 0.8;
+    if(phase === "dictation" && started){
 
-    speechSynthesis.speak(speech);
-}
+        clearInterval(timer);
+
+        startTranscription();
+    }
+
+});
+
 
 function checkTest(){
 
     clearInterval(timer);
-    speechSynthesis.cancel();
 
-    let original =
-    matter.toLowerCase().replace(/[.,]/g,"").split(/\s+/);
+    let text =
+        document.getElementById("typing").value.trim();
+
+    let typedWords =
+        text ? text.split(/\s+/).length : 0;
+
+    let actualWords =
+        matter.trim().split(/\s+/).length;
+
+    let actual =
+        matter.toLowerCase()
+        .replace(/[^\w\s']/g,"")
+        .split(/\s+/);
 
     let typed =
-    document.getElementById("typing").value
-    .toLowerCase()
-    .replace(/[.,]/g,"")
-    .split(/\s+/)
-    .filter(Boolean);
+        text.toLowerCase()
+        .replace(/[^\w\s']/g,"")
+        .split(/\s+/);
+
+    let max =
+        Math.max(actual.length,typed.length);
 
     let errors = 0;
 
-    for(let i=0;i<original.length;i++){
+    for(let i=0;i<max;i++){
 
-        if(original[i] !== typed[i]){
+        if(actual[i] !== typed[i]){
             errors++;
         }
+
     }
 
-    errors += Math.max(0,typed.length-original.length);
-
     let accuracy =
-    Math.max(0,((original.length-errors)/original.length)*100);
+        typedWords === 0
+        ? 0
+        : Math.max(0,
+            ((typedWords - errors) / typedWords) * 100
+          );
 
     document.getElementById("total").innerText =
-    original.length;
+        actualWords;
 
     document.getElementById("typed").innerText =
-    typed.length;
+        typedWords;
 
     document.getElementById("error").innerText =
-    errors;
+        errors;
 
     document.getElementById("accuracy").innerText =
-    accuracy.toFixed(2)+"%";
+        accuracy.toFixed(2) + "%";
 
     document.getElementById("result").style.display =
-    "block";
+        "block";
 
-    document.getElementById("typing").disabled = true;
-    document.getElementById("submit").style.display = "none";
+    document.getElementById("submit").style.display =
+        "none";
+
+    document.getElementById("status").innerText =
+        "✅ Test Completed";
+
 }
+
 
 function showMatter(){
 
-    let box = document.getElementById("matter");
+    let box =
+        document.getElementById("matter");
+
+    box.style.display = "block";
 
     box.innerText = matter;
-    box.style.display = "block";
+
 }
 
 </script>
