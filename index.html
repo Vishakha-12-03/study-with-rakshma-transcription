@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>English Shorthand Transcription Test</title>
 
 <style>
+
 body{
     font-family:Arial,sans-serif;
     margin:0;
@@ -20,18 +22,9 @@ header{
     padding:30px 10px;
 }
 
-header h1{
-    margin:0 0 15px;
-    font-size:32px;
-}
-
-header p{
-    font-size:20px;
-}
-
 .box{
-    max-width:950px;
-    margin:30px auto;
+    max-width:900px;
+    margin:25px auto;
     background:white;
     padding:25px;
     border-radius:12px;
@@ -45,13 +38,9 @@ header p{
     margin-bottom:25px;
 }
 
-.info div{
-    font-size:18px;
-}
-
 .info b{
     display:block;
-    font-size:28px;
+    font-size:22px;
     color:#080b45;
 }
 
@@ -69,69 +58,80 @@ button:disabled{
     background:#aaa;
 }
 
-#status{
-    text-align:center;
-    font-size:18px;
-    font-weight:bold;
-    margin:15px;
-}
-
-#timer{
-    text-align:center;
-    font-size:42px;
-    font-weight:bold;
-    margin:20px;
-    color:#080b45;
+#submit{
+    background:#159447;
 }
 
 textarea{
     width:100%;
-    height:400px;
+    height:350px;
     margin-top:15px;
-    font-size:18px;
-    padding:15px;
+    font-size:17px;
+    padding:12px;
     box-sizing:border-box;
-    resize:vertical;
-}
-
-#submit{
-    display:none;
-    background:#159447;
 }
 
 #result{
     display:none;
 }
 
-.result-line{
-    font-size:19px;
-    margin:10px 0;
+#status{
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    margin:15px 0;
 }
 
-#matter{
-    display:none;
-    line-height:1.7;
+#timer{
+    text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    margin:15px;
+    color:#080b45;
 }
+
+@media(max-width:600px){
+
+    .box{
+        margin:15px 5px;
+        padding:18px;
+    }
+
+    .info b{
+        font-size:19px;
+    }
+
+    textarea{
+        height:300px;
+    }
+
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
+
 <h1>English Shorthand Transcription Test</h1>
+
 <p>80 WPM Practice Test</p>
+
 </header>
+
 
 <div class="box">
 
 <div class="info">
+
 <div>
 <b>80 WPM</b>
 Speed
 </div>
 
 <div>
-<b id="phase">10:00</b>
+<b id="modeTime">10:00</b>
 Time
 </div>
 
@@ -139,64 +139,98 @@ Time
 <b id="words">0</b>
 Words
 </div>
+
 </div>
 
+
 <p>
+
 <b>Instruction:</b>
+
 First listen to the complete 10-minute dictation.
-After dictation ends, you will get 30 minutes for transcription.
+
+After the dictation ends, you will get 30 minutes for transcription.
+
 </p>
 
-<button id="startBtn" onclick="startTest()">▶ Start Test</button>
 
-<div id="status">Ready for Dictation</div>
+<button id="startBtn" onclick="startTest()">
+▶ Start Test
+</button>
 
-<div id="timer">10:00</div>
 
-<audio id="dictation" preload="auto">
-<source src="24-08-2026-2317_UylfzrYv.mp3" type="audio/mpeg">
-Your browser does not support audio.
-</audio>
+<div id="status">
+Ready for Dictation
+</div>
 
-<textarea id="typing"
+
+<div id="timer">
+10:00
+</div>
+
+
+<textarea
+id="typing"
 disabled
-placeholder="Your transcription will start here after the dictation ends...">
-</textarea>
+placeholder="Your transcription will start here after the dictation ends..."
+></textarea>
+
 
 <br>
 
-<button id="submit" onclick="checkTest()">✓ Submit Test</button>
+
+<button
+id="submit"
+onclick="checkTest()"
+style="display:none"
+>
+✓ Submit Test
+</button>
 
 </div>
+
+
 
 <div class="box" id="result">
 
 <h2>📊 Test Result</h2>
 
-<div class="result-line">
-Total Words: <b id="total">0</b>
+<p>
+Total Words:
+<b id="total">0</b>
+</p>
+
+<p>
+Typed Words:
+<b id="typed">0</b>
+</p>
+
+<p>
+Errors:
+<b id="error">0</b>
+</p>
+
+<p>
+Accuracy:
+<b id="accuracy">0%</b>
+</p>
+
+<button onclick="showMatter()">
+👁 View Actual Dictation
+</button>
+
+<p id="matter" style="display:none"></p>
+
 </div>
 
-<div class="result-line">
-Typed Words: <b id="typed">0</b>
-</div>
-
-<div class="result-line">
-Errors: <b id="error">0</b>
-</div>
-
-<div class="result-line">
-Accuracy: <b id="accuracy">0%</b>
-</div>
-
-<button onclick="showMatter()">👁 View Actual Dictation</button>
-
-<p id="matter"></p>
-
-</div>
 
 
 <script>
+
+
+/* =========================
+   DICTATION MATTER
+========================= */
 
 const matter = `The Hon'ble Court, while considering the present matter, has carefully examined the facts placed on record by both the parties. The petitioner has approached the Court seeking appropriate relief against the order passed by the concerned authority. It has been submitted on behalf of the petitioner that the order in question was passed without properly considering the documents and circumstances placed before the authority. Learned counsel appearing for the petitioner submitted that the petitioner had fulfilled all the conditions prescribed under the relevant rules and had submitted the required documents within the stipulated period. It was further submitted that the petitioner was entitled to a fair and reasonable opportunity of hearing before any adverse decision could be taken against him. On the other hand, learned counsel appearing for the State opposed the petition and submitted that the competent authority had passed the impugned order after considering the available records. According to the State, the petitioner had failed to satisfy certain requirements prescribed under the applicable rules.
 
@@ -208,18 +242,25 @@ The authority must ensure that the order is based upon relevant material and tha
 
 The Court makes it clear that the present order shall not be treated as an expression of opinion on the merits of the claim made by the petitioner. The competent authority shall independently examine the matter and take an appropriate decision in accordance with the applicable rules and the facts available on record. Justice requires not only a correct decision but also a fair procedure. The purpose of judicial review is to ensure that public authorities act within the framework of law and exercise their powers in a reasonable and responsible manner. Courts do not normally substitute their own opinion for that of the administrative authority, but they may interfere where the decision is arbitrary, unreasonable, without jurisdiction, or contrary to the principles of natural justice. It is expected that the concerned authority shall complete the fresh proceedings within a reasonable period and communicate the decision to the petitioner without unnecessary delay.`;
 
-let phase = "dictation";
-let time = 600;
+
+/* =========================
+   VARIABLES
+========================= */
+
+let dictationAudio = null;
+
 let timer = null;
+
+let time = 600;
+
+let transcriptionStarted = false;
+
 let started = false;
 
-function formatTime(seconds){
-    let m = Math.floor(seconds / 60);
-    let s = seconds % 60;
 
-    return String(m).padStart(2,"0") + ":" +
-           String(s).padStart(2,"0");
-}
+/* =========================
+   START TEST
+========================= */
 
 function startTest(){
 
@@ -231,140 +272,283 @@ function startTest(){
 
     document.getElementById("typing").disabled = true;
 
+    document.getElementById("submit").style.display = "none";
+
+    let count = matter.trim().split(/\s+/).length;
+
+    document.getElementById("words").innerText = count;
+
     document.getElementById("status").innerText =
         "🎧 Dictation is playing...";
 
     time = 600;
 
-    document.getElementById("timer").innerText =
-        formatTime(time);
+    updateTimer();
 
-    let audio = document.getElementById("dictation");
+    playDictation();
 
-    audio.currentTime = 0;
-
-    audio.play();
-
-    timer = setInterval(function(){
-
-        time--;
-
-        document.getElementById("timer").innerText =
-            formatTime(time);
-
-        if(time <= 0){
-
-            clearInterval(timer);
-
-            startTranscription();
-        }
-
-    },1000);
 }
 
 
-function startTranscription(){
+/* =========================
+   PLAY ACTUAL MP3
+========================= */
 
-    phase = "transcription";
+function playDictation(){
 
-    time = 1800;
+    if(dictationAudio){
+        return;
+    }
 
-    document.getElementById("phase").innerText = "30:00";
+    dictationAudio = new Audio(
+        "24-08-2026-2317_UylfzrYv.mp3"
+    );
 
-    document.getElementById("timer").innerText =
-        "30:00";
-
-    document.getElementById("status").innerText =
-        "⌨️ Dictation completed — 30 minutes transcription time started.";
-
-    document.getElementById("typing").disabled = false;
-
-    document.getElementById("typing").focus();
-
-    document.getElementById("submit").style.display =
-        "inline-block";
-
-    timer = setInterval(function(){
-
-        time--;
-
-        document.getElementById("timer").innerText =
-            formatTime(time);
-
-        if(time <= 0){
-
-            clearInterval(timer);
-
-            checkTest();
-        }
-
-    },1000);
-}
+    dictationAudio.preload = "auto";
 
 
-/* If audio finishes earlier than exactly 10 minutes,
-   transcription starts immediately after audio ends. */
+    /* Audio starts from Start Test button */
 
-document.getElementById("dictation").addEventListener("ended",function(){
+    dictationAudio.play().then(function(){
 
-    if(phase === "dictation" && started){
+        startDictationTimer();
+
+    }).catch(function(error){
+
+        console.log(error);
+
+        document.getElementById("status").innerText =
+            "⚠️ Audio could not start. Press Start Test again.";
+
+        document.getElementById("startBtn").disabled = false;
+
+        started = false;
+
+    });
+
+
+    /* =========================
+       AUDIO FINISHED
+    ========================= */
+
+    dictationAudio.onended = function(){
 
         clearInterval(timer);
 
         startTranscription();
-    }
 
-});
+    };
 
+
+    /* =========================
+       AUDIO ERROR
+    ========================= */
+
+    dictationAudio.onerror = function(){
+
+        clearInterval(timer);
+
+        document.getElementById("status").innerText =
+            "❌ Audio file could not be loaded.";
+
+        document.getElementById("startBtn").disabled = false;
+
+        started = false;
+
+    };
+
+}
+
+
+/* =========================
+   10 MINUTE DICTATION TIMER
+========================= */
+
+function startDictationTimer(){
+
+    clearInterval(timer);
+
+    timer = setInterval(function(){
+
+        if(!dictationAudio){
+            return;
+        }
+
+        let remaining =
+            Math.max(
+                0,
+                Math.ceil(
+                    dictationAudio.duration -
+                    dictationAudio.currentTime
+                )
+            );
+
+        time = remaining;
+
+        updateTimer();
+
+
+    },500);
+
+}
+
+
+/* =========================
+   START 30 MIN TRANSCRIPTION
+========================= */
+
+function startTranscription(){
+
+    transcriptionStarted = true;
+
+    clearInterval(timer);
+
+    time = 1800;
+
+    document.getElementById("timer").innerText =
+        "30:00";
+
+    document.getElementById("modeTime").innerText =
+        "30:00";
+
+    document.getElementById("status").innerText =
+        "⌨️ Dictation finished — Transcription started";
+
+    document.getElementById("typing").disabled = false;
+
+    document.getElementById("typing").placeholder =
+        "Type your transcription here...";
+
+    document.getElementById("submit").style.display =
+        "inline-block";
+
+    document.getElementById("typing").focus();
+
+
+    timer = setInterval(function(){
+
+        time--;
+
+        updateTimer();
+
+
+        if(time <= 0){
+
+            clearInterval(timer);
+
+            document.getElementById("typing").disabled = true;
+
+            document.getElementById("status").innerText =
+                "⏰ 30 minutes completed.";
+
+            checkTest();
+
+        }
+
+    },1000);
+
+}
+
+
+/* =========================
+   TIMER DISPLAY
+========================= */
+
+function updateTimer(){
+
+    let m = Math.floor(time / 60);
+
+    let s = time % 60;
+
+    let display =
+        String(m).padStart(2,"0") +
+        ":" +
+        String(s).padStart(2,"0");
+
+    document.getElementById("timer").innerText =
+        display;
+
+    document.getElementById("modeTime").innerText =
+        display;
+
+}
+
+
+/* =========================
+   CHECK TEST
+========================= */
 
 function checkTest(){
 
     clearInterval(timer);
 
-    let text =
-        document.getElementById("typing").value.trim();
+    if(dictationAudio){
 
-    let typedWords =
-        text ? text.split(/\s+/).length : 0;
+        dictationAudio.pause();
 
-    let actualWords =
-        matter.trim().split(/\s+/).length;
+    }
 
-    let actual =
-        matter.toLowerCase()
-        .replace(/[^\w\s']/g,"")
-        .split(/\s+/);
+
+    let original =
+        matter
+        .toLowerCase()
+        .replace(/[.,'’]/g,"")
+        .split(/\s+/)
+        .filter(Boolean);
+
 
     let typed =
-        text.toLowerCase()
-        .replace(/[^\w\s']/g,"")
-        .split(/\s+/);
+        document.getElementById("typing")
+        .value
+        .toLowerCase()
+        .replace(/[.,'’]/g,"")
+        .split(/\s+/)
+        .filter(Boolean);
 
-    let max =
-        Math.max(actual.length,typed.length);
 
     let errors = 0;
 
-    for(let i=0;i<max;i++){
 
-        if(actual[i] !== typed[i]){
+    for(let i = 0; i < original.length; i++){
+
+        if(original[i] !== typed[i]){
+
             errors++;
+
         }
 
     }
 
-    let accuracy =
-        typedWords === 0
-        ? 0
-        : Math.max(0,
-            ((typedWords - errors) / typedWords) * 100
-          );
+
+    errors +=
+        Math.max(
+            0,
+            typed.length - original.length
+        );
+
+
+    let accuracy = 0;
+
+
+    if(original.length > 0){
+
+        accuracy =
+            Math.max(
+                0,
+                (
+                    (original.length - errors) /
+                    original.length
+                ) * 100
+            );
+
+    }
+
 
     document.getElementById("total").innerText =
-        actualWords;
+        original.length;
 
     document.getElementById("typed").innerText =
-        typedWords;
+        typed.length;
 
     document.getElementById("error").innerText =
         errors;
@@ -372,26 +556,41 @@ function checkTest(){
     document.getElementById("accuracy").innerText =
         accuracy.toFixed(2) + "%";
 
+
     document.getElementById("result").style.display =
         "block";
+
+
+    document.getElementById("typing").disabled =
+        true;
 
     document.getElementById("submit").style.display =
         "none";
 
+
     document.getElementById("status").innerText =
         "✅ Test Completed";
 
+
+    document.getElementById("timer").innerText =
+        "00:00";
+
 }
 
+
+/* =========================
+   SHOW MATTER
+========================= */
 
 function showMatter(){
 
     let box =
         document.getElementById("matter");
 
-    box.style.display = "block";
-
     box.innerText = matter;
+
+    box.style.display =
+        "block";
 
 }
 
