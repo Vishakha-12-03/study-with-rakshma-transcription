@@ -93,6 +93,11 @@ button{
     color:white;
 }
 
+.view{
+    background:#080b4f;
+    color:white;
+}
+
 .reset{
     background:#666;
     color:white;
@@ -139,15 +144,31 @@ textarea:disabled{
 
 .result{
     display:none;
-    margin-top:25px;
+    margin-top:30px;
     padding:25px;
     background:#eef7ee;
     border-radius:12px;
     font-size:19px;
+    line-height:1.8;
 }
 
 .result h2{
     color:#176b17;
+}
+
+.original{
+    display:none;
+    margin-top:25px;
+    padding:25px;
+    background:#fafafa;
+    border:2px solid #ddd;
+    border-radius:12px;
+    line-height:1.8;
+    font-size:18px;
+}
+
+.original h2{
+    color:#080b4f;
 }
 
 @media(max-width:700px){
@@ -203,7 +224,7 @@ textarea:disabled{
         </div>
 
         <div class="stat">
-            <h2>798</h2>
+            <h2 id="wordCount">798</h2>
             <p>Words</p>
         </div>
 
@@ -211,7 +232,7 @@ textarea:disabled{
 
     <div class="instruction">
         <b>Instruction:</b>
-        First listen to the complete dictation.
+        First listen to the complete 10-minute dictation.
         After the dictation ends, you will get 30 minutes for transcription.
     </div>
 
@@ -221,17 +242,13 @@ textarea:disabled{
             class="start"
             id="startBtn"
             onclick="startTest()">
-
             ▶ Start Test
-
         </button>
 
         <button
             class="reset"
             onclick="resetTest()">
-
             ↻ Reset Test
-
         </button>
 
     </div>
@@ -239,21 +256,14 @@ textarea:disabled{
     <div
         class="status"
         id="status">
-
         Ready to start
-
     </div>
 
     <div
         class="timer"
         id="timer">
-
         10:00
-
     </div>
-
-
-    <!-- YOUR REAL MP3 -->
 
     <audio
         id="dictationAudio"
@@ -268,15 +278,11 @@ textarea:disabled{
 
     </audio>
 
-
     <textarea
         id="transcription"
         disabled
         placeholder="Your transcription will start here after the dictation ends...">
     </textarea>
-
-
-    <!-- SUBMIT BUTTON -->
 
     <div class="buttons">
 
@@ -285,13 +291,10 @@ textarea:disabled{
             id="submitBtn"
             onclick="submitTest()"
             disabled>
-
             ✓ Submit Test
-
         </button>
 
     </div>
-
 
     <div
         class="result"
@@ -299,7 +302,28 @@ textarea:disabled{
 
         <h2>✅ Test Submitted</h2>
 
-        <p id="resultText"></p>
+        <div id="resultText"></div>
+
+        <div class="buttons">
+
+            <button
+                class="view"
+                id="viewBtn"
+                onclick="toggleOriginal()">
+                👁️ View Original Dictation
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        class="original"
+        id="originalBox">
+
+        <h2>📄 Original Dictation</h2>
+
+        <div id="originalText"></div>
 
     </div>
 
@@ -308,12 +332,87 @@ textarea:disabled{
 
 <script>
 
-/* =========================
+/* =====================================================
+   ORIGINAL 798-WORD DICTATION
+   Source: User-provided PDF
+===================================================== */
+
+const originalPassage = `
+The Hon'ble Court, while considering the present matter, has carefully examined the
+facts placed on record by both the parties. The petitioner has approached the Court
+seeking appropriate relief against the order passed by the concerned authority. It has
+been submitted on behalf of the petitioner that the order in question was passed
+without properly considering the documents and circumstances placed before the
+authority. Learned counsel appearing for the petitioner submitted that the petitioner
+had fulfilled all the conditions prescribed under the relevant rules and had submitted
+the required documents within the stipulated period. It was further submitted that the
+petitioner was entitled to a fair and reasonable opportunity of hearing before any
+adverse decision could be taken against him. On the other hand, learned counsel
+appearing for the State opposed the petition and submitted that the competent
+authority had passed the impugned order after considering the available records.
+According to the State, the petitioner had failed to satisfy certain requirements
+prescribed under the applicable rules.
+
+It was therefore argued that no interference by the Court was necessary. The Court
+has considered the submissions advanced by learned counsel for the parties and has
+carefully perused the material available on record. It is well settled that whenever an
+administrative authority passes an order affecting the rights of a person, such order
+must disclose proper reasons. The reasons should demonstrate that the authority has
+applied its mind to the relevant facts and provisions of law. The principle of natural
+justice requires that a person likely to be affected by an adverse decision should
+ordinarily be given a reasonable opportunity to present his case. Such an opportunity
+is an important part of a fair procedure. The authority concerned must consider the
+explanation and documents submitted by the person before arriving at a final
+conclusion. In the present case, the Court finds that the order passed by the concerned
+authority does not contain sufficient or based on irrelevant considerations.
+
+The authority has referred to certain general observations but has not explained why the
+documents submitted by the petitioner were not acceptable. The Court is therefore of
+the view that the matter requires reconsideration by the competent authority. It is also
+necessary to observe that administrative powers must be exercised in accordance with law
+and for a proper purpose. Every public authority is expected to act fairly, reasonably and
+without discrimination. The exercise of statutory power cannot be arbitrary The decision-
+making process must be transparent and consistent with the principles of fairness. The
+Constitution guarantees equality before law and equal protection of laws to every person.
+Public authorities are therefore required to ensure that similarly situated persons are
+treated in a similar manner. Any distinction made between persons must have a reasonable
+basis and must be supported by the relevant provisions of law. The Court has further
+observed that the responsibility of a public authority does not end merely by passing an
+order.
+
+The authority must ensure that the order is based upon relevant material and that the
+affected person is able to understand the reasons for the decision. A speaking order is
+essential because it enables the parties as well as the Court to examine whether the
+authority has acted within the limits of its jurisdiction. In view of the facts and
+circumstances of the present case, the impugned order is hereby set aside. The matter is
+remitted to the competent authority for fresh consideration. The authority shall examine
+the representation of the petitioner along with all relevant documents and shall pass a
+fresh and reasoned order in accordance with law. The petitioner shall be given a
+reasonable opportunity of hearing before the matter is finally decided. The competent
+authority shall consider all relevant submissions made by the petitioner and shall not be
+influenced by any observation contained in the earlier order which has been set aside by
+this Court.
+
+The Court makes it clear that the present order shall not be treated as an expression of
+opinion on the merits of the claim made by the petitioner. The competent authority shall
+independently examine the matter and take an appropriate decision in accordance with the
+applicable rules and the facts available on record. Justice requires not only a correct
+decision but also a fair procedure. The purpose of judicial review is to ensure that public
+authorities act within the framework of law and exercise their powers in a reasonable and
+responsible manner. Courts do not normally substitute their own opinion for that of the
+administrative authority, but they may interfere where the decision is arbitrary,
+unreasonable, without jurisdiction, or contrary to the principles of natural justice. It
+is expected that the concerned authority shall complete the fresh proceedings within a
+reasonable period and communicate the decision to the petitioner without unnecessary
+delay.
+`;
+
+
+/* =====================================================
    VARIABLES
-========================= */
+===================================================== */
 
 let dictationTime = 600;
-
 let transcriptionTime = 1800;
 
 let timerInterval = null;
@@ -322,14 +421,12 @@ let phase = "ready";
 
 let transcriptionStarted = false;
 
-let testStartTime = null;
-
 let transcriptionStartTime = null;
 
 
-/* =========================
+/* =====================================================
    ELEMENTS
-========================= */
+===================================================== */
 
 const audio =
     document.getElementById("dictationAudio");
@@ -352,6 +449,12 @@ const result =
 const resultText =
     document.getElementById("resultText");
 
+const originalBox =
+    document.getElementById("originalBox");
+
+const originalText =
+    document.getElementById("originalText");
+
 const startBtn =
     document.getElementById("startBtn");
 
@@ -359,9 +462,35 @@ const submitBtn =
     document.getElementById("submitBtn");
 
 
-/* =========================
+/* =====================================================
+   WORD TOKENIZER
+===================================================== */
+
+function getWords(text){
+
+    return text
+        .replace(/[“”]/g,'"')
+        .replace(/[‘’]/g,"'")
+        .toLowerCase()
+        .match(/[a-z0-9]+(?:['-][a-z0-9]+)*/gi) || [];
+
+}
+
+
+/* =====================================================
+   ORIGINAL WORD COUNT
+===================================================== */
+
+const originalWords =
+    getWords(originalPassage);
+
+document.getElementById("wordCount").textContent =
+    originalWords.length;
+
+
+/* =====================================================
    FORMAT TIME
-========================= */
+===================================================== */
 
 function formatTime(seconds){
 
@@ -374,12 +503,13 @@ function formatTime(seconds){
     return String(min).padStart(2,"0")
         + ":"
         + String(sec).padStart(2,"0");
+
 }
 
 
-/* =========================
-   DISPLAY TIMER
-========================= */
+/* =====================================================
+   DISPLAY TIME
+===================================================== */
 
 function displayTime(value){
 
@@ -389,12 +519,13 @@ function displayTime(value){
     timer.textContent = text;
 
     phaseTime.textContent = text;
+
 }
 
 
-/* =========================
+/* =====================================================
    START TEST
-========================= */
+===================================================== */
 
 function startTest(){
 
@@ -406,7 +537,7 @@ function startTest(){
 
     transcriptionStarted = false;
 
-    testStartTime = Date.now();
+    transcriptionStartTime = null;
 
     startBtn.disabled = true;
 
@@ -415,6 +546,8 @@ function startTest(){
     transcription.disabled = true;
 
     result.style.display = "none";
+
+    originalBox.style.display = "none";
 
     dictationTime = 600;
 
@@ -425,15 +558,8 @@ function startTest(){
 
     audio.currentTime = 0;
 
-
-    /*
-       Audio must successfully start
-       before the timer starts.
-    */
-
     const playPromise =
         audio.play();
-
 
     if(playPromise !== undefined){
 
@@ -459,22 +585,16 @@ function startTest(){
 }
 
 
-/* =========================
+/* =====================================================
    DICTATION TIMER
-========================= */
+===================================================== */
 
 function startDictationTimer(){
 
     clearInterval(timerInterval);
 
-
     timerInterval =
         setInterval(function(){
-
-            /*
-               If audio has ended,
-               immediately start transcription.
-            */
 
             if(audio.ended){
 
@@ -487,21 +607,13 @@ function startDictationTimer(){
                 return;
             }
 
-
             dictationTime--;
 
             if(dictationTime < 0){
                 dictationTime = 0;
             }
 
-
             displayTime(dictationTime);
-
-
-            /*
-               Safety limit:
-               maximum dictation time = 10 minutes.
-            */
 
             if(dictationTime <= 0){
 
@@ -518,9 +630,9 @@ function startDictationTimer(){
 }
 
 
-/* =========================
+/* =====================================================
    AUDIO ENDED
-========================= */
+===================================================== */
 
 audio.addEventListener(
     "ended",
@@ -540,9 +652,9 @@ audio.addEventListener(
 );
 
 
-/* =========================
+/* =====================================================
    START TRANSCRIPTION
-========================= */
+===================================================== */
 
 function startTranscription(){
 
@@ -572,7 +684,6 @@ function startTranscription(){
 
     transcription.focus();
 
-
     timerInterval =
         setInterval(function(){
 
@@ -583,12 +694,6 @@ function startTranscription(){
             }
 
             displayTime(transcriptionTime);
-
-
-            /*
-               30 minutes completed:
-               automatically submit.
-            */
 
             if(transcriptionTime <= 0){
 
@@ -603,19 +708,87 @@ function startTranscription(){
 }
 
 
-/* =========================
-   MANUAL SUBMIT
-========================= */
+/* =====================================================
+   ACCURACY CALCULATION
+===================================================== */
+
+function calculateAccuracy(original, typed){
+
+    const n = original.length;
+
+    const m = typed.length;
+
+    let dp = [];
+
+    for(let i=0;i<=n;i++){
+
+        dp[i] = [];
+
+        dp[i][0] = i;
+
+    }
+
+    for(let j=0;j<=m;j++){
+        dp[0][j] = j;
+    }
+
+    for(let i=1;i<=n;i++){
+
+        for(let j=1;j<=m;j++){
+
+            if(original[i-1] === typed[j-1]){
+
+                dp[i][j] =
+                    dp[i-1][j-1];
+
+            }else{
+
+                dp[i][j] =
+                    Math.min(
+
+                        dp[i-1][j] + 1,
+
+                        dp[i][j-1] + 1,
+
+                        dp[i-1][j-1] + 1
+
+                    );
+
+            }
+
+        }
+
+    }
+
+    const mistakes =
+        dp[n][m];
+
+    const correct =
+        Math.max(0, n - mistakes);
+
+    const accuracy =
+        n === 0
+        ? 0
+        : (correct / n) * 100;
+
+    return {
+        mistakes:mistakes,
+        correct:correct,
+        accuracy:accuracy
+    };
+
+}
+
+
+/* =====================================================
+   SUBMIT TEST
+===================================================== */
 
 function submitTest(){
 
-    if(
-        phase !== "transcription" &&
-        phase !== "ready"
-    ){
+    if(phase !== "transcription"){
         return;
     }
-
 
     clearInterval(timerInterval);
 
@@ -627,65 +800,84 @@ function submitTest(){
 
     phase = "submitted";
 
-
-    let typedText =
+    const typedText =
         transcription.value.trim();
 
+    const typedWords =
+        getWords(typedText);
 
-    let typedWords =
-        typedText.length === 0
-        ? 0
-        : typedText.split(/\s+/).length;
+    const resultData =
+        calculateAccuracy(
+            originalWords,
+            typedWords
+        );
 
 
-    let timeTaken = "N/A";
-
+    let timeTaken = 1800;
 
     if(transcriptionStartTime){
 
-        let elapsed =
+        timeTaken =
             Math.floor(
                 (Date.now() -
                 transcriptionStartTime) / 1000
             );
 
+    }
 
-        /*
-           Maximum 30 minutes.
-        */
+    if(timeTaken > 1800){
+        timeTaken = 1800;
+    }
 
-        if(elapsed > 1800){
-            elapsed = 1800;
-        }
-
-
-        timeTaken =
-            formatTime(elapsed);
-
+    if(timeTaken < 0){
+        timeTaken = 0;
     }
 
 
     displayTime(0);
-
 
     status.textContent =
         "✅ Test Submitted";
 
 
     resultText.innerHTML =
-        "<b>Words Typed:</b> "
-        + typedWords
-        + "<br><br>"
-        +
-        "<b>Time Taken:</b> "
-        + timeTaken
-        + "<br><br>"
-        +
-        "Your transcription has been submitted successfully.";
+
+        "<b>Total Words:</b> "
+        + originalWords.length
+
+        + "<br>"
+
+        + "<b>Typed Words:</b> "
+        + typedWords.length
+
+        + "<br>"
+
+        + "<b>Correct Words:</b> "
+        + resultData.correct
+
+        + "<br>"
+
+        + "<b>❌ Mistakes:</b> "
+        + resultData.mistakes
+
+        + "<br>"
+
+        + "<b>🎯 Accuracy:</b> "
+        + resultData.accuracy.toFixed(2)
+        + "%"
+
+        + "<br>"
+
+        + "<b>⏱️ Time Taken:</b> "
+        + formatTime(timeTaken);
 
 
     result.style.display =
         "block";
+
+
+    originalText.textContent =
+        originalPassage.trim();
 
 
     window.scrollTo({
@@ -696,9 +888,34 @@ function submitTest(){
 }
 
 
-/* =========================
-   RESET TEST
-========================= */
+/* =====================================================
+   VIEW ORIGINAL
+===================================================== */
+
+function toggleOriginal(){
+
+    if(originalBox.style.display === "block"){
+
+        originalBox.style.display =
+            "none";
+
+    }else{
+
+        originalBox.style.display =
+            "block";
+
+        originalBox.scrollIntoView({
+            behavior:"smooth"
+        });
+
+    }
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
 
 function resetTest(){
 
@@ -713,8 +930,6 @@ function resetTest(){
     phase = "ready";
 
     transcriptionStarted = false;
-
-    testStartTime = null;
 
     transcriptionStartTime = null;
 
@@ -736,6 +951,8 @@ function resetTest(){
     submitBtn.disabled = true;
 
     result.style.display = "none";
+
+    originalBox.style.display = "none";
 
 }
 
