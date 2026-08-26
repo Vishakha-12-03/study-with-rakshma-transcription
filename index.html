@@ -7,7 +7,6 @@
 <title>English Shorthand Transcription Test</title>
 
 <style>
-
 *{
     box-sizing:border-box;
 }
@@ -89,6 +88,11 @@ button{
     color:white;
 }
 
+.submit{
+    background:#16803c;
+    color:white;
+}
+
 .reset{
     background:#666;
     color:white;
@@ -142,6 +146,10 @@ textarea:disabled{
     font-size:19px;
 }
 
+.result h2{
+    color:#176b17;
+}
+
 @media(max-width:700px){
 
     header h1{
@@ -166,65 +174,46 @@ textarea:disabled{
         font-size:32px;
     }
 
+    button{
+        width:90%;
+    }
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
-
     <h1>English Shorthand Transcription Test</h1>
-
     <p>80 WPM Practice Test</p>
-
 </header>
-
 
 <div class="container">
 
     <div class="stats">
 
         <div class="stat">
-
             <h2>80 WPM</h2>
-
             <p>Speed</p>
-
         </div>
 
-
         <div class="stat">
-
-            <h2>10:00</h2>
-
-            <p>Dictation Time</p>
-
+            <h2 id="phaseTime">10:00</h2>
+            <p>Time</p>
         </div>
 
-
         <div class="stat">
-
             <h2>798</h2>
-
             <p>Words</p>
-
         </div>
 
     </div>
-
 
     <div class="instruction">
-
         <b>Instruction:</b>
-
         First listen to the complete dictation.
-
         After the dictation ends, you will get 30 minutes for transcription.
-
     </div>
-
 
     <div class="buttons">
 
@@ -237,7 +226,6 @@ textarea:disabled{
 
         </button>
 
-
         <button
             class="reset"
             onclick="resetTest()">
@@ -248,7 +236,6 @@ textarea:disabled{
 
     </div>
 
-
     <div
         class="status"
         id="status">
@@ -256,7 +243,6 @@ textarea:disabled{
         Ready to start
 
     </div>
-
 
     <div
         class="timer"
@@ -267,7 +253,7 @@ textarea:disabled{
     </div>
 
 
-    <!-- REAL MP3 AUDIO -->
+    <!-- YOUR REAL MP3 -->
 
     <audio
         id="dictationAudio"
@@ -290,15 +276,30 @@ textarea:disabled{
     </textarea>
 
 
+    <!-- SUBMIT BUTTON -->
+
+    <div class="buttons">
+
+        <button
+            class="submit"
+            id="submitBtn"
+            onclick="submitTest()"
+            disabled>
+
+            ✓ Submit Test
+
+        </button>
+
+    </div>
+
+
     <div
         class="result"
         id="result">
 
-        <b>Dictation completed.</b>
+        <h2>✅ Test Submitted</h2>
 
-        <br><br>
-
-        Your 30-minute transcription time has started.
+        <p id="resultText"></p>
 
     </div>
 
@@ -307,9 +308,8 @@ textarea:disabled{
 
 <script>
 
-
 /* =========================
-   TEST VARIABLES
+   VARIABLES
 ========================= */
 
 let dictationTime = 600;
@@ -322,6 +322,10 @@ let phase = "ready";
 
 let transcriptionStarted = false;
 
+let testStartTime = null;
+
+let transcriptionStartTime = null;
+
 
 /* =========================
    ELEMENTS
@@ -333,6 +337,9 @@ const audio =
 const timer =
     document.getElementById("timer");
 
+const phaseTime =
+    document.getElementById("phaseTime");
+
 const status =
     document.getElementById("status");
 
@@ -342,8 +349,14 @@ const transcription =
 const result =
     document.getElementById("result");
 
+const resultText =
+    document.getElementById("resultText");
+
 const startBtn =
     document.getElementById("startBtn");
+
+const submitBtn =
+    document.getElementById("submitBtn");
 
 
 /* =========================
@@ -361,7 +374,21 @@ function formatTime(seconds){
     return String(min).padStart(2,"0")
         + ":"
         + String(sec).padStart(2,"0");
+}
 
+
+/* =========================
+   DISPLAY TIMER
+========================= */
+
+function displayTime(value){
+
+    const text =
+        formatTime(value);
+
+    timer.textContent = text;
+
+    phaseTime.textContent = text;
 }
 
 
@@ -375,41 +402,37 @@ function startTest(){
         return;
     }
 
-
     phase = "dictation";
 
     transcriptionStarted = false;
 
+    testStartTime = Date.now();
 
     startBtn.disabled = true;
 
-
-    status.textContent =
-        "🎧 Dictation is playing...";
-
-
-    timer.textContent =
-        formatTime(dictationTime);
-
+    submitBtn.disabled = true;
 
     transcription.disabled = true;
 
-
     result.style.display = "none";
 
+    dictationTime = 600;
 
-    /* Start audio from beginning */
+    displayTime(dictationTime);
+
+    status.textContent =
+        "🎧 Dictation is playing...";
 
     audio.currentTime = 0;
 
 
     /*
-       IMPORTANT:
-       Timer will start only after
-       audio actually starts playing.
+       Audio must successfully start
+       before the timer starts.
     */
 
-    const playPromise = audio.play();
+    const playPromise =
+        audio.play();
 
 
     if(playPromise !== undefined){
@@ -422,12 +445,12 @@ function startTest(){
         })
         .catch(function(){
 
-            status.textContent =
-                "▶ Press the Play button on the audio player.";
+            phase = "ready";
 
             startBtn.disabled = false;
 
-            phase = "ready";
+            status.textContent =
+                "▶ Press Play on the audio player.";
 
         });
 
@@ -445,90 +468,76 @@ function startDictationTimer(){
     clearInterval(timerInterval);
 
 
-    timerInterval = setInterval(function(){
+    timerInterval =
+        setInterval(function(){
 
-        /*
-           If audio has already ended,
-           stop the timer immediately.
-        */
+            /*
+               If audio has ended,
+               immediately start transcription.
+            */
 
-        if(audio.ended){
+            if(audio.ended){
 
-            clearInterval(timerInterval);
+                clearInterval(timerInterval);
 
-            timer.textContent = "00:00";
+                displayTime(0);
 
-            startTranscription();
+                startTranscription();
 
-            return;
-
-        }
-
-
-        dictationTime--;
+                return;
+            }
 
 
-        if(dictationTime < 0){
+            dictationTime--;
 
-            dictationTime = 0;
-
-        }
-
-
-        timer.textContent =
-            formatTime(dictationTime);
+            if(dictationTime < 0){
+                dictationTime = 0;
+            }
 
 
-        /*
-           Safety backup:
-           If 10 minutes are reached,
-           finish dictation.
-        */
+            displayTime(dictationTime);
 
-        if(dictationTime <= 0){
 
-            clearInterval(timerInterval);
+            /*
+               Safety limit:
+               maximum dictation time = 10 minutes.
+            */
 
-            audio.pause();
+            if(dictationTime <= 0){
 
-            startTranscription();
+                clearInterval(timerInterval);
 
-        }
+                audio.pause();
 
-    },1000);
+                startTranscription();
+
+            }
+
+        },1000);
 
 }
 
 
 /* =========================
-   AUDIO FINISHED
+   AUDIO ENDED
 ========================= */
 
-/*
-   THIS IS THE MAIN FIX.
+audio.addEventListener(
+    "ended",
+    function(){
 
-   As soon as the actual MP3 ends,
-   transcription starts immediately.
+        if(phase !== "dictation"){
+            return;
+        }
 
-   It does NOT wait for 10:00.
-*/
+        clearInterval(timerInterval);
 
-audio.addEventListener("ended", function(){
+        displayTime(0);
 
-    if(phase !== "dictation"){
-        return;
+        startTranscription();
+
     }
-
-
-    clearInterval(timerInterval);
-
-
-    timer.textContent = "00:00";
-
-
-    startTranscription();
-
-});
+);
 
 
 /* =========================
@@ -541,74 +550,148 @@ function startTranscription(){
         return;
     }
 
-
     transcriptionStarted = true;
-
-
-    clearInterval(timerInterval);
-
 
     phase = "transcription";
 
+    transcriptionStartTime =
+        Date.now();
+
+    clearInterval(timerInterval);
 
     transcriptionTime = 1800;
 
+    displayTime(transcriptionTime);
 
     status.textContent =
-        "⌨️ Dictation finished — Start Transcription";
-
-
-    timer.textContent =
-        formatTime(transcriptionTime);
-
+        "⌨️ Transcription Started — 30 Minutes";
 
     transcription.disabled = false;
 
+    submitBtn.disabled = false;
 
     transcription.focus();
 
 
-    result.style.display = "block";
+    timerInterval =
+        setInterval(function(){
+
+            transcriptionTime--;
+
+            if(transcriptionTime < 0){
+                transcriptionTime = 0;
+            }
+
+            displayTime(transcriptionTime);
 
 
-    /*
-       Start 30-minute transcription timer.
-    */
+            /*
+               30 minutes completed:
+               automatically submit.
+            */
 
-    timerInterval = setInterval(function(){
+            if(transcriptionTime <= 0){
 
-        transcriptionTime--;
+                clearInterval(timerInterval);
+
+                submitTest();
+
+            }
+
+        },1000);
+
+}
 
 
-        if(transcriptionTime < 0){
+/* =========================
+   MANUAL SUBMIT
+========================= */
 
-            transcriptionTime = 0;
+function submitTest(){
 
+    if(
+        phase !== "transcription" &&
+        phase !== "ready"
+    ){
+        return;
+    }
+
+
+    clearInterval(timerInterval);
+
+    audio.pause();
+
+    transcription.disabled = true;
+
+    submitBtn.disabled = true;
+
+    phase = "submitted";
+
+
+    let typedText =
+        transcription.value.trim();
+
+
+    let typedWords =
+        typedText.length === 0
+        ? 0
+        : typedText.split(/\s+/).length;
+
+
+    let timeTaken = "N/A";
+
+
+    if(transcriptionStartTime){
+
+        let elapsed =
+            Math.floor(
+                (Date.now() -
+                transcriptionStartTime) / 1000
+            );
+
+
+        /*
+           Maximum 30 minutes.
+        */
+
+        if(elapsed > 1800){
+            elapsed = 1800;
         }
 
 
-        timer.textContent =
-            formatTime(transcriptionTime);
+        timeTaken =
+            formatTime(elapsed);
+
+    }
 
 
-        if(transcriptionTime <= 0){
-
-            clearInterval(timerInterval);
+    displayTime(0);
 
 
-            transcription.disabled = true;
+    status.textContent =
+        "✅ Test Submitted";
 
 
-            status.textContent =
-                "⏰ Transcription time finished";
+    resultText.innerHTML =
+        "<b>Words Typed:</b> "
+        + typedWords
+        + "<br><br>"
+        +
+        "<b>Time Taken:</b> "
+        + timeTaken
+        + "<br><br>"
+        +
+        "Your transcription has been submitted successfully.";
 
 
-            timer.textContent =
-                "00:00";
+    result.style.display =
+        "block";
 
-        }
 
-    },1000);
+    window.scrollTo({
+        top:document.body.scrollHeight,
+        behavior:"smooth"
+    });
 
 }
 
@@ -621,52 +704,42 @@ function resetTest(){
 
     clearInterval(timerInterval);
 
-
     timerInterval = null;
-
-
-    phase = "ready";
-
-
-    transcriptionStarted = false;
-
-
-    dictationTime = 600;
-
-
-    transcriptionTime = 1800;
-
 
     audio.pause();
 
-
     audio.currentTime = 0;
 
+    phase = "ready";
 
-    timer.textContent =
-        "10:00";
+    transcriptionStarted = false;
 
+    testStartTime = null;
+
+    transcriptionStartTime = null;
+
+    dictationTime = 600;
+
+    transcriptionTime = 1800;
+
+    displayTime(600);
 
     status.textContent =
         "Ready to start";
 
-
     transcription.value = "";
-
 
     transcription.disabled = true;
 
+    startBtn.disabled = false;
+
+    submitBtn.disabled = true;
 
     result.style.display = "none";
 
-
-    startBtn.disabled = false;
-
 }
 
-
 </script>
-
 
 </body>
 </html>
